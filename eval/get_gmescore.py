@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import argparse
 from utils.gme.gme_model import GmeQwen2VL
+from tqdm import tqdm
 
 import decord
 
@@ -66,36 +67,40 @@ def main():
 
     output_json_file = os.path.join(output_json_folder, "gmescore.json")
     os.makedirs(output_json_folder, exist_ok=True)
+    if os.path.exists(output_json_file):
+        print("continue")
+        return
 
     with open(input_json_file, "r") as f:
         prompts = json.load(f)
     gme = GmeQwen2VL(model_path, attn_model="flash_attention_2", device=device)
 
+    video_files = [f for f in os.listdir(input_video_folder) if f.endswith(".mp4")]
+
     results_dict = {}
-    for video_filename in os.listdir(input_video_folder):
-        if video_filename.endswith(".mp4"):
-            video_name = os.path.splitext(video_filename)[0]
+    for video_filename in tqdm(video_files, desc="Processing videos"):
+        video_name = os.path.splitext(video_filename)[0]
 
-            if video_name in prompts.keys():
-                text_prompt = prompts[video_name].get("prompt", "")
-            else:
-                print(f"No prompt found for video: {video_name}. Skipping.")
-                continue
+        if video_name in prompts.keys():
+            text_prompt = prompts[video_name].get("prompt", "")
+        else:
+            print(f"No prompt found for video: {video_name}. Skipping.")
+            continue
 
-            video_path = os.path.join(input_video_folder, video_filename)
-            frames = sample_video_frames(video_path, num_frames=num_frames)
+        video_path = os.path.join(input_video_folder, video_filename)
+        frames = sample_video_frames(video_path, num_frames=num_frames)
 
-            e_query = gme.get_text_embeddings(
-                texts=[text_prompt] * len(frames),
-                instruction="Find an image that matches the given text.",
-            )
-            e_corpus = gme.get_image_embeddings(
-                images=frames, is_query=False, show_progress_bar=False
-            )
-            gme_scores = (e_query * e_corpus).sum(-1)
-            gme_score = gme_scores.mean().detach().item()
+        e_query = gme.get_text_embeddings(
+            texts=[text_prompt] * len(frames),
+            instruction="Find an image that matches the given text.",
+        )
+        e_corpus = gme.get_image_embeddings(
+            images=frames, is_query=False, show_progress_bar=False
+        )
+        gme_scores = (e_query * e_corpus).sum(-1)
+        gme_score = gme_scores.mean().detach().item()
 
-            results_dict[video_name] = {"gme_score": gme_score}
+        results_dict[video_name] = {"gme_score": gme_score}
 
     with open(output_json_file, "w") as results_file:
         json.dump(results_dict, results_file, indent=4)

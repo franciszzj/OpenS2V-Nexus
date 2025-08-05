@@ -30,8 +30,11 @@ def extract_useful_frames(bbox_infos, min_valid_frames=81, tolerance=5):
         frame_num_ed = max(frame_num_vec) + 1
     for frame_num in range(frame_num_st, frame_num_ed):
         str_frame_num = str(frame_num)
-        if str_frame_num in data and data[str_frame_num]["face"] \
-                and is_face_large_enough_v2(data[str_frame_num]["face"]):
+        if (
+            str_frame_num in data
+            and data[str_frame_num]["face"]
+            and is_face_large_enough_v2(data[str_frame_num]["face"])
+        ):
             current_segment.append(frame_num)
             non_face_count = 0
         else:

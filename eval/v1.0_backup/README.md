@@ -1,7 +1,5 @@
-# <u>Evaluation Pipeline</u> by *OpenS2V-Eval-v1.1*
+# <u>Evaluation Pipeline</u> by *OpenS2V-Eval-v1.0*
 This repo describes how to evaluate customized model like [OpenS2V-Eval](https://huggingface.co/datasets/BestWishYsh/OpenS2V-Eval) in the [OpenS2V-Nexus](https://arxiv.org) paper.
-
-The **v1.1** version adds motion smoothness on top of **v1.0** to provide a more accurate measurement of motion quality.
 
 ## 🎉 Overview
 
@@ -86,22 +84,6 @@ pip install -e .
 
 ❗There will be an error about the mmcv version exceeds 2.1.0, users should directly change the `mmcv_maximum_version` to `2.3.0` in `Your_PATH_to_Anaconda/env/opens2v_yoloworld/lib/python3.10/site-packages/mmdet/__init__.py` and `Your_PATH_to_Anaconda/env/opens2v_yoloworld/lib/python3.10/site-packages/mmyolo/__init__.py`
 
-### Prepare Environment for Q-Align
-```bash
-# 0. Create conda environment
-conda create -n opens2v_qalign python=3.10
-conda activate opens2v_qalign
-
-# 1. Install PyTorch and other dependencies
-pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121 # or cu118
-#ensure your cuda version is 11.8 or 12.1, and ensure the gcc in a high version (we use 11.2)
-pip install flash-attn --no-build-isolation
-
-# 2. Install main dependencies
-cd OpenS2V-Nexus/eval/utils/Q-Align
-pip install -e .
-```
-
 ## 🗝️ Usage
 
  *<u>For all steps, we provide both input and output examples in the `demo_result` folder.</u>*
@@ -113,9 +95,8 @@ pip install -e .
 conda activate opens2v
 # Get AestheticScore
 python get_aesscore.py
-# Get Motion Amplitude
-python get_motion_amplitude.py
-
+# Get MotionScore
+python get_motionscore.py
 # Get FaceSim-Cur
 python get_facesim.py
 # Get GmeScore
@@ -127,11 +108,6 @@ python get_naturalscore.py
 conda activate opens2v_yoloworld
 # Get NexusScore
 python get_nexusscore.py
-
-# 2. Use QAlign Environment
-conda activate opens2v_qalign
-# Get Motion Smoothness
-python get_motion_smoothness.py
 ```
 
 ### Merge File and Submission

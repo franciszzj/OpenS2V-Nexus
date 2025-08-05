@@ -41,8 +41,7 @@ def compute_scores(input_data):
         [
             input_data["total_score"],
             input_data["aes_score"],
-            input_data["motion_amplitude"],
-            input_data["motion_smoothness"],
+            input_data["motion_score"],
             input_data["facesim_cur"],
             input_data["gme_score"],
             input_data["nexus_score"],
@@ -57,8 +56,7 @@ def compute_scores_human_domain(input_data):
         [
             input_data["total_score"],
             input_data["aes_score"],
-            input_data["motion_amplitude"],
-            input_data["motion_smoothness"],
+            input_data["motion_score"],
             input_data["facesim_cur"],
             input_data["gme_score"],
             input_data["natural_score"],
@@ -127,7 +125,6 @@ def add_opendomain_eval(
             f"{input_data[4] * 100:.2f}%",
             f"{input_data[5] * 100:.2f}%",
             f"{input_data[6] * 100:.2f}%",
-            f"{input_data[7] * 100:.2f}%",
         ]
         csv_data.loc[col] = new_data
         csv_data.to_csv(CSV_DIR_OPEN_DOMAIN_RESULTS, index=False)
@@ -194,7 +191,6 @@ def add_humandomain_eval(
             f"{input_data[3] * 100:.2f}%",
             f"{input_data[4] * 100:.2f}%",
             f"{input_data[5] * 100:.2f}%",
-            f"{input_data[6] * 100:.2f}%",
         ]
         csv_data.loc[col] = new_data
         csv_data.to_csv(CSV_DIR_HUMAN_DOMAIN_RESULTS, index=False)
@@ -262,7 +258,6 @@ def add_singledomain_eval(
             f"{input_data[4] * 100:.2f}%",
             f"{input_data[5] * 100:.2f}%",
             f"{input_data[6] * 100:.2f}%",
-            f"{input_data[7] * 100:.2f}%",
         ]
         csv_data.loc[col] = new_data
         csv_data.to_csv(CSV_DIR_SINGLE_DOMAIN_RESULTS, index=False)

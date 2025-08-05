@@ -262,6 +262,9 @@ def main():
 
     output_json_file = os.path.join(output_json_folder, "facesim.json")
     os.makedirs(output_json_folder, exist_ok=True)
+    if os.path.exists(output_json_file):
+        print("continue")
+        return
 
     face_arc_path = os.path.join(model_path, "face_extractor")
     face_cur_path = os.path.join(

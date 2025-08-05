@@ -189,14 +189,17 @@ def main():
 
     for i in [1, 2, 3]:
         output_json_file = os.path.join(output_json_folder, f"naturalscore_{i}.json")
-        process_folder(
-            input_video_folder,
-            output_json_file,
-            num_workers,
-            api_key,
-            model_name,
-            base_url,
-        )
+        if not os.path.exists(output_json_file):
+            process_folder(
+                input_video_folder,
+                output_json_file,
+                num_workers,
+                api_key,
+                model_name,
+                base_url,
+            )
+        else:
+            print(f"{output_json_file}: continue")
 
     print(f"All results have been saved to {output_json_folder}")
 

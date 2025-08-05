@@ -1,5 +1,6 @@
 import argparse
 import os.path as osp
+from tqdm import tqdm
 
 import os
 import json
@@ -162,7 +163,7 @@ def yoloworld_inference(
     return output_image
 
 
-def load_model_and_config(args, clip_model_path):
+def load_model_and_config(args, clip_model_path, device):
     cfg = Config.fromfile(args.model_config)
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
@@ -261,7 +262,7 @@ def parse_args():
     return args
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
     device = "cuda"
 
@@ -275,21 +276,24 @@ if __name__ == "__main__":
 
     output_json_file = os.path.join(output_json_folder, "nexusscore.json")
     os.makedirs(output_json_folder, exist_ok=True)
+    if os.path.exists(output_json_file):
+        print("continue")
+        return
 
     yolo_vision_model, yolo_processor, runner, txt_feats = load_model_and_config(
-        args, yolo_clip_model_path
+        args, yolo_clip_model_path, device
     )
     gme = GmeQwen2VL(gme_model_path, attn_model="flash_attention_2", device=device)
 
-    with open(args.input_json_file, "r") as f:
+    with open(input_json_file, "r") as f:
         json_data = json.load(f)
 
-    video_files = [f for f in os.listdir(args.input_video_folder) if f.endswith(".mp4")]
+    video_files = [f for f in os.listdir(input_video_folder) if f.endswith(".mp4")]
 
     results = {}
-    for video_file in video_files:
+    for video_file in tqdm(video_files, desc="Processing videos"):
         try:
-            video_path = os.path.join(args.input_video_folder, video_file)
+            video_path = os.path.join(input_video_folder, video_file)
             prefix = os.path.splitext(video_file)[0]
 
             print(f"Processing {prefix}...")
@@ -299,7 +303,7 @@ if __name__ == "__main__":
 
             frames = sample_video_frames(video_path, num_frames=32)
 
-            gme_I_scores = []
+            # gme_I_scores = []
             all_prompt_images = []
             all_image_labels = []
             all_local_images = []
@@ -323,7 +327,7 @@ if __name__ == "__main__":
                         image_label = "human"
 
                     prompt_image_file_path = os.path.join(
-                        args.input_image_folder, prompt_image_path
+                        input_image_folder, prompt_image_path
                     )
                     prompt_image = Image.open(prompt_image_file_path)
 
@@ -387,7 +391,11 @@ if __name__ == "__main__":
             print(f"[ERROR] Failed to process {video_file}: {e}")
             continue
 
-    with open(args.output_json_file, "w") as f:
+    with open(output_json_file, "w") as f:
         json.dump(results, f, indent=4)
 
     print(f"All results have been saved to {output_json_file}")
+
+
+if __name__ == "__main__":
+    main()

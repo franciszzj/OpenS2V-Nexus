@@ -1,0 +1,12 @@
+Model,Venue,Evaluated by,TotalScore↑,Aesthetics↑,MotionSmoothness↑,MotionAmplitude↑,FaceSim↑,GmeScore↑,NexusScore↑,NaturalScore↑
+[VACE-P1.3B](https://github.com/ali-vilab/VACE),Closed-Source,OpenS2V Team,49.2%,48.93%,95.68%,11.91%,18.04%,70.78%,36.24%,66.85%
+[VACE-1.3B](https://github.com/ali-vilab/VACE),Closed-Source,OpenS2V Team,51.13%,49.41%,95.42%,22.51%,22.37%,70.87%,38.34%,68.33%
+[Kling1.6(20250503)](https://app.klingai.com/cn/),Closed-Source,OpenS2V Team,56.67%,45.97%,85.76%,47.17%,39.27%,65.36%,49.3%,73.63%
+[Pika2.1(20250503)](https://pika.art/),Closed-Source,OpenS2V Team,53.12%,47.43%,86.07%,26.32%,32.33%,69.84%,47.35%,64.68%
+[SkyReels-A2-P14B](https://github.com/SkyworkAI/SkyReels-A2),Closed-Source,OpenS2V Team,55.06%,40.85%,85.54%,26.41%,54.42%,61.81%,48.6%,61.85%
+[MAGREF-480P](https://github.com/MAGREF-Video/MAGREF),Closed-Source,OpenS2V Team,53.44%,46.31%,92.63%,27.43%,33.77%,69.02%,42.45%,68.33%
+[Phantom-14B](https://github.com/Phantom-video/Phantom),Closed-Source,OpenS2V Team,57.02%,47.46%,94.86%,41.55%,51.82%,70.07%,35.3%,71.11%
+[Phantom-1.3B](https://github.com/Phantom-video/Phantom),Closed-Source,OpenS2V Team,54.5%,49.0%,93.7%,16.38%,44.03%,69.54%,37.72%,66.76%
+[VACE-14B](https://github.com/ali-vilab/VACE),Closed-Source,OpenS2V Team,61.75%,48.94%,93.16%,19.69%,64.65%,65.86%,50.82%,70.56%
+[Vidu2.0(20250503)](https://www.vidu.cn/),Closed-Source,OpenS2V Team,52.9%,43.32%,91.88%,17.52%,36.19%,66.96%,44.84%,66.11%
+[HunyuanCustom](https://github.com/Tencent-Hunyuan/HunyuanCustom),Closed-Source,OpenS2V Team,56.89%,44.84%,86.49%,17.94%,55.93%,62.71%,56.49%,58.98%

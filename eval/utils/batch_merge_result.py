@@ -205,14 +205,41 @@ def process_scores(data, eval_type):
         }
 
 
-eval_type = "Open-Domain"  # [Open-Domain, Human-Domain, Single-Object]
-input_json_folder = "demo_result/model_name_output_json"
-output_json_path = f"demo_result/model_name_{eval_type}.json"
+# eval_type = "Open-Domain"  # [Open-Domain, Human-Domain, Single-Object]
+# input_json_folder = "/mnt/workspace/ysh/Code/ConsisID-X/0_util_codes/OpenS2V-Nexus/eval/smoothness_results/open_domain/keling_1.6"
+# output_json_path = f"/mnt/workspace/ysh/Code/ConsisID-X/0_util_codes/OpenS2V-Nexus/eval/smoothness_results/open_domain/0_merge/keling_1.6_{eval_type}.json"
 
-merged_score = merge_scores_files(input_json_folder)
-process_score = process_scores(merged_score, eval_type)
+# merged_score = merge_scores_files(input_json_folder)
+# process_score = process_scores(merged_score, eval_type)
 
-with open(output_json_path, "w") as output_file:
-    json.dump(process_score, output_file, indent=4)
+# with open(output_json_path, "w") as output_file:
+#     json.dump(process_score, output_file, indent=4)
 
-print(f"Processed and saved: {output_json_path}")
+# print(f"Processed and saved: {output_json_path}")
+
+eval_type = "Single-Domain"  # [Open-Domain, Human-Domain, Single-Object]
+base_input_json_folder = "single_domain"
+output_base_json_path = "single_domain/0_merge"
+
+
+def process_multiple_folders(base_input_folder, output_base_folder, eval_type):
+    for folder_name in os.listdir(base_input_folder):
+        folder_path = os.path.join(base_input_folder, folder_name)
+
+        if os.path.isdir(folder_path):
+            input_json_folder = folder_path
+            output_json_path = os.path.join(
+                output_base_folder, f"{folder_name}_{eval_type}.json"
+            )
+
+            print(f"Processing folder: {folder_name}")
+            merged_score = merge_scores_files(input_json_folder)
+            process_score = process_scores(merged_score, eval_type)
+
+            with open(output_json_path, "w") as output_file:
+                json.dump(process_score, output_file, indent=4)
+
+            print(f"Processed and saved: {output_json_path}")
+
+
+process_multiple_folders(base_input_json_folder, output_base_json_path, eval_type)

@@ -3,8 +3,7 @@ MODEL_INFO = ["Model", "Venue", "Evaluated by"]
 ALL_RESULTS = [
     "TotalScore↑",
     "Aesthetics↑",
-    "MotionSmoothness↑",
-    "MotionAmplitude↑",
+    "Motion↑",
     "FaceSim↑",
     "GmeScore↑",
     "NexusScore↑",
@@ -14,8 +13,7 @@ ALL_RESULTS = [
 OPEN_DOMAIN_RESULTS = [
     "TotalScore↑",
     "Aesthetics↑",
-    "MotionSmoothness↑",
-    "MotionAmplitude↑",
+    "Motion↑",
     "FaceSim↑",
     "GmeScore↑",
     "NexusScore↑",
@@ -24,8 +22,7 @@ OPEN_DOMAIN_RESULTS = [
 HUMAN_DOMAIN_RESULTS = [
     "TotalScore↑",
     "Aesthetics↑",
-    "MotionSmoothness↑",
-    "MotionAmplitude↑",
+    "Motion↑",
     "FaceSim↑",
     "GmeScore↑",
     "NaturalScore↑",
@@ -33,8 +30,7 @@ HUMAN_DOMAIN_RESULTS = [
 SINGLE_DOMAIN_RESULTS = [
     "TotalScore↑",
     "Aesthetics↑",
-    "MotionSmoothness↑",
-    "MotionAmplitude↑",
+    "Motion↑",
     "FaceSim↑",
     "GmeScore↑",
     "NexusScore↑",
@@ -53,25 +49,23 @@ NEW_DATA_TITLE_TYPE = [
     "number",
 ]
 
-CSV_DIR_OPEN_DOMAIN_RESULTS = "./file_v1.1/results_Open-Domain.csv"
-CSV_DIR_HUMAN_DOMAIN_RESULTS = "./file_v1.1/results_Human-Domain.csv"
-CSV_DIR_SINGLE_DOMAIN_RESULTS = "./file_v1.1/results_Single-Domain.csv"
+CSV_DIR_OPEN_DOMAIN_RESULTS = "./results_Open-Domain.csv"
+CSV_DIR_HUMAN_DOMAIN_RESULTS = "./results_Human-Domain.csv"
+CSV_DIR_SINGLE_DOMAIN_RESULTS = "./results_Single-Domain.csv"
 
 COLUMN_NAMES = MODEL_INFO + ALL_RESULTS
 COLUMN_NAMES_HUMAN = MODEL_INFO + HUMAN_DOMAIN_RESULTS
 
 LEADERBORAD_INTRODUCTION = """
-    # OpenS2V-Eval-1.1 Leaderboard
+    # OpenS2V-Eval Leaderboard
     
-    Welcome to the leaderboard of the OpenS2V-Eval-1.1! 
-    
-    The **v1.1** version adds motion smoothness on top of **v1.0** to provide a more accurate measurement of motion quality.
+    Welcome to the leaderboard of the OpenS2V-Eval!
      
-    🏆 OpenS2V-Eval is a core component of **OpenS2V-Nexus**, designed to establish a foundational infrastructure for *Subject-to-Video* (S2V) generation. It presents 180 prompts spanning seven major categories of S2V, incorporating both real and synthetic test data. To better align evaluation with human preferences, it introduce three new automatic metrics—NexusScore, NaturalScore, and GmeScore—that independently assess subject consistency, naturalness, and textual relevance in generated videos. 
-
+    🏆 OpenS2V-Eval is a core component of **OpenS2V-Nexus**, designed to establish a foundational infrastructure for *Subject-to-Video* (S2V) generation. It presents 180 prompts spanning seven major categories of S2V, incorporating both real and synthetic test data. To better align evaluation with human preferences, it introduce three new automatic metrics—NexusScore, NaturalScore, and GmeScore—that independently assess subject consistency, naturalness, and textual relevance in generated videos.
+    
     If you like our project, please give us a star ⭐ on GitHub for the latest update.
 
-    [GitHub](https://github.com/PKU-YuanGroup/OpenS2V-Nexus) | [Arxiv](https://arxiv.org/) | [Home Page](https://pku-yuangroup.github.io/OpenS2V-Nexus/) | [OpenS2V-Eval](https://huggingface.co/datasets/BestWishYsh/OpenS2V-Eval) | [OpenS2V-5M](https://huggingface.co/datasets/BestWishYsh/OpenS2V-5M) | [OpenS2V-Eval-v1.0-LeaderBoard](https://huggingface.co/spaces/BestWishYsh/OpenS2V-Eval/tree/main/file_v1.0)
+    [GitHub](https://github.com/PKU-YuanGroup/OpenS2V-Nexus) | [Arxiv](https://arxiv.org/) | [Home Page](https://pku-yuangroup.github.io/OpenS2V-Nexus/) | [OpenS2V-Eval](https://huggingface.co/datasets/BestWishYsh/OpenS2V-Eval) | [OpenS2V-5M](https://huggingface.co/datasets/BestWishYsh/OpenS2V-5M)
 """
 
 SUBMIT_INTRODUCTION = """# Submission Guidelines
@@ -84,7 +78,7 @@ SUBMIT_INTRODUCTION = """# Submission Guidelines
 
 TABLE_INTRODUCTION = """In the table below, we use six dimensions as the primary evaluation metrics for each task.
         1. Visual Quality: Aesthetics.
-        2. Motion Quality: Motion Smoothness and Motion Amplitude.
+        2. Motion Amplitude: Motion.
         3. Text Relevance: GmeScore.
         4. Subject Consistency: FaceSim and NexusScore.
         5. Subject Naturalness: NaturalScore.
@@ -92,7 +86,7 @@ TABLE_INTRODUCTION = """In the table below, we use six dimensions as the primary
 
 TABLE_INTRODUCTION_HUMAN = """In the table below, we use six dimensions as the primary evaluation metrics for each task.
         1. Visual Quality: Aesthetics.
-        2. Motion Quality: Motion Smoothness and Motion Amplitude.
+        2. Motion Amplitude: Motion.
         3. Text Relevance: GmeScore.
         4. Subject Consistency: FaceSim.
         5. Naturalness: NaturalScore.

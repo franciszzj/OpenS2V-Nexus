@@ -120,6 +120,9 @@ def main():
 
     output_json_file = os.path.join(output_json_folder, "aesthetic_score.json")
     os.makedirs(output_json_folder, exist_ok=True)
+    if os.path.exists(output_json_file):
+        print("continue")
+        return
 
     aes_model = AestheticScorer(
         dtype=torch.float32, aes_clip_path=aes_clip_path, aes_main_path=aes_main_path

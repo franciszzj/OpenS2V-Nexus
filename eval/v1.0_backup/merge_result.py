@@ -27,15 +27,11 @@ def merge_scores_files(folder_path):
                 scores["aes_score"] = aes_dict["aes_score"]
             del scores["aesthetic_score"]
 
-        if "motion_amplitude" in scores:
-            motion_dict = scores["motion_amplitude"]
+        if "motionscore" in scores:
+            motion_dict = scores["motionscore"]
             if isinstance(motion_dict, dict) and "motion_fb" in motion_dict:
-                scores["motion_amplitude"] = motion_dict["motion_fb"]
-
-        if "motion_smoothness" in scores:
-            motion_dict = scores["motion_smoothness"]
-            if isinstance(motion_dict, dict) and "motion_smoothness" in motion_dict:
-                scores["motion_smoothness"] = motion_dict["motion_smoothness"]
+                scores["motion_score"] = motion_dict["motion_fb"]
+            del scores["motionscore"]
 
         if "facesim" in scores:
             face_dict = scores["facesim"]
@@ -69,19 +65,17 @@ def merge_scores_files(folder_path):
 
 
 def process_scores(data, eval_type):
-    total_aes_score = total_facesim_cur = total_gme_score = total_motion_amplitude = (
-        total_motion_smoothness
-    ) = total_nexus_score = total_natural_score = 0
-    count_aes_score = count_facesim_cur = count_gme_score = count_motion_amplitude = (
-        count_motion_smoothness
-    ) = count_nexus_score = count_natural_score = 0
+    total_aes_score = total_facesim_cur = total_gme_score = total_motion = (
+        total_nexus_score
+    ) = total_natural_score = 0
+    count_aes_score = count_facesim_cur = count_gme_score = count_motion = (
+        count_nexus_score
+    ) = count_natural_score = 0
 
     min_aes_score = 4
     max_aes_score = 7
-    min_motion_amplitude = 0
-    max_motion_amplitude = 1
-    min_motion_smoothness = 0
-    max_motion_smoothness = 1
+    min_motion_score = 0
+    max_motion_score = 1
     min_facesim_cur = 0
     max_facesim_cur = 1
     min_gme_score = 0
@@ -97,17 +91,10 @@ def process_scores(data, eval_type):
             total_aes_score += aes_score
             count_aes_score += 1
 
-        if "motion_amplitude" in value:
-            motion_amplitude = min(abs(value["motion_amplitude"]), max_motion_amplitude)
-            total_motion_amplitude += motion_amplitude
-            count_motion_amplitude += 1
-
-        if "motion_smoothness" in value:
-            motion_smoothness = min(
-                abs(value["motion_smoothness"]), max_motion_smoothness
-            )
-            total_motion_smoothness += motion_smoothness
-            count_motion_smoothness += 1
+        if "motion_score" in value:
+            motion_score = min(abs(value["motion_score"]), max_motion_score)
+            total_motion += motion_score
+            count_motion += 1
 
         if "facesim_cur" in value:
             facesim_cur = min(value["facesim_cur"], max_facesim_cur)
@@ -132,14 +119,7 @@ def process_scores(data, eval_type):
             count_natural_score += 1
 
     avg_aes_score = total_aes_score / count_aes_score if count_aes_score else 0
-    avg_motion_amplitude = (
-        total_motion_amplitude / count_motion_amplitude if count_motion_amplitude else 0
-    )
-    avg_motion_smoothness = (
-        total_motion_smoothness / count_motion_smoothness
-        if count_motion_smoothness
-        else 0
-    )
+    avg_motion = total_motion / count_motion if count_motion else 0
     avg_facesim_cur = total_facesim_cur / count_facesim_cur if count_facesim_cur else 0
     avg_gme_score = total_gme_score / count_gme_score if count_gme_score else 0
     avg_nexus_score = total_nexus_score / count_nexus_score if count_nexus_score else 0
@@ -148,11 +128,8 @@ def process_scores(data, eval_type):
     )
 
     aes_score = (avg_aes_score - min_aes_score) / (max_aes_score - min_aes_score)
-    motion_amplitude = (avg_motion_amplitude - min_motion_amplitude) / (
-        max_motion_amplitude - min_motion_amplitude
-    )
-    motion_smoothness = (avg_motion_smoothness - min_motion_smoothness) / (
-        max_motion_smoothness - min_motion_smoothness
+    motion_score = (avg_motion - min_motion_score) / (
+        max_motion_score - min_motion_score
     )
     facesim_cur = (avg_facesim_cur - min_facesim_cur) / (
         max_facesim_cur - min_facesim_cur
@@ -167,9 +144,8 @@ def process_scores(data, eval_type):
 
     if eval_type != "Human-Domain":
         total_score = (
-            0.16 * aes_score
-            + 0.06 * motion_smoothness
-            + 0.02 * motion_amplitude
+            0.12 * aes_score
+            + 0.12 * motion_score
             + 0.20 * facesim_cur
             + 0.12 * gme_score
             + 0.20 * nexus_score
@@ -178,8 +154,7 @@ def process_scores(data, eval_type):
         return {
             "total_score": total_score,
             "aes_score": aes_score,
-            "motion_smoothness": motion_smoothness,
-            "motion_amplitude": motion_amplitude,
+            "motion_score": motion_score,
             "facesim_cur": facesim_cur,
             "gme_score": gme_score,
             "nexus_score": nexus_score,
@@ -187,9 +162,8 @@ def process_scores(data, eval_type):
         }
     else:
         total_score = (
-            0.18 * aes_score
-            + 0.09 * motion_smoothness
-            + 0.03 * motion_amplitude
+            0.15 * aes_score
+            + 0.15 * motion_score
             + 0.25 * facesim_cur
             + 0.15 * gme_score
             + 0.30 * natural_score
@@ -197,8 +171,7 @@ def process_scores(data, eval_type):
         return {
             "total_score": total_score,
             "aes_score": aes_score,
-            "motion_smoothness": motion_smoothness,
-            "motion_amplitude": motion_amplitude,
+            "motion_score": motion_score,
             "facesim_cur": facesim_cur,
             "gme_score": gme_score,
             "natural_score": natural_score,
