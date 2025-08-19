@@ -63,7 +63,7 @@ def fast_draw_masks(scene, detections, opacity=0.5):
     return output
 
 
-input_json = "../../demo_result/step5/final_output/dataset1/gm1252760410-365677148_part2_step1-0-95_step2-0-95_step4_step5_step6.json"
+input_json = "../../demo_result/step5/final_output/dataset1/gm1252760410-365677148_part2_step1-0-95_step2-0-95_step3_step4_step5.json"
 input_video_path = (
     "../../demo_result/step0/videos/dataset1/gm1252760410-365677148_part2.mp4"
 )
