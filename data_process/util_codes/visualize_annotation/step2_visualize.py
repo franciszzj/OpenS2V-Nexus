@@ -1,20 +1,18 @@
 import json
 import os
-
 import cv2
-
+from PIL import Image
+from diffusers.utils import export_to_video
 
 def draw_bbox_and_track_id(video_path, json_data, output_path, cut, crop):
     cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Could not open video file {video_path}")
+        return
 
     s_x, e_x, s_y, e_y = crop
-
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_width = e_x - s_x
-    frame_height = e_y - s_y
-
-    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
+    frames_for_export = []
 
     start_frame, end_frame = cut
 
@@ -26,6 +24,7 @@ def draw_bbox_and_track_id(video_path, json_data, output_path, cut, crop):
             break
 
         if start_frame <= frame_count <= end_frame:
+            # Crop the frame.
             frame = frame[s_y:e_y, s_x:e_x]
             frame_data = json_data.get(str(frame_count))
 
@@ -52,7 +51,10 @@ def draw_bbox_and_track_id(video_path, json_data, output_path, cut, crop):
                         2,
                     )
 
-            out.write(frame)
+            # Convert the BGR frame to RGB and then to a PIL Image.
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            pil_image = Image.fromarray(frame_rgb)
+            frames_for_export.append(pil_image)
 
         if frame_count > end_frame:
             break
@@ -60,10 +62,16 @@ def draw_bbox_and_track_id(video_path, json_data, output_path, cut, crop):
         frame_count += 1
 
     cap.release()
-    out.release()
-    print(
-        f"Processing completed, only frames {start_frame} ~ {end_frame} were processed, and the results have been saved to: {output_path}"
-    )
+    
+    # Check if any frames were collected before exporting.
+    if frames_for_export:
+        # Export the collected list of PIL Images to a video file.
+        export_to_video(frames_for_export, output_path, fps=fps)
+        print(
+            f"Processing completed, only frames {start_frame} ~ {end_frame} were processed, and the results have been saved to: {output_path}"
+        )
+    else:
+        print("No frames were processed in the specified range.")
 
 
 if __name__ == "__main__":
@@ -84,7 +92,10 @@ if __name__ == "__main__":
 
         video_path = video_root + "/" + metadata["path"]
         output_path = os.path.join(output_dir, json_file.replace(".json", ".mp4"))
+        
+        # Check for the correct key in metadata
+        face_cut_key = 'face_cut' if 'face_cut' in metadata else 'cut'
 
         draw_bbox_and_track_id(
-            video_path, bbox, output_path, metadata["face_cut"], metadata["crop"]
+            video_path, bbox, output_path, metadata[face_cut_key], metadata["crop"]
         )
