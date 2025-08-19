@@ -1,23 +1,21 @@
 import json
 import os
-
 import cv2
+import torch
+from PIL import Image
+from diffusers.utils import export_to_video
 
-
-def draw_bbox_and_track_id(video_path, json_data, output_path, cut, crop):
+def draw_bbox_and_track_id_diffusers(video_path, json_data, output_path, cut, crop):
     cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Could not open video file {video_path}")
+        return
 
     s_x, e_x, s_y, e_y = crop
-
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_width = e_x - s_x
-    frame_height = e_y - s_y
-
-    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
-
     start_frame, end_frame = cut
 
+    frames_for_export = []
     frame_count = 0
 
     while cap.isOpened():
@@ -39,9 +37,7 @@ def draw_bbox_and_track_id(video_path, json_data, output_path, cut, crop):
                         int(box["x2"]),
                         int(box["y2"]),
                     )
-
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
                     cv2.putText(
                         frame,
                         f"ID: {track_id}",
@@ -51,19 +47,25 @@ def draw_bbox_and_track_id(video_path, json_data, output_path, cut, crop):
                         (255, 0, 0),
                         2,
                     )
-
-            out.write(frame)
+            
+            # Convert BGR frame to RGB and then to PIL Image
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            pil_image = Image.fromarray(frame_rgb)
+            frames_for_export.append(pil_image)
 
         if frame_count > end_frame:
             break
 
         frame_count += 1
-
+    
     cap.release()
-    out.release()
-    print(
-        f"Processing completed, only frames {start_frame} ~ {end_frame} were processed, and the results have been saved to: {output_path}"
-    )
+
+    if frames_for_export:
+        # Use diffusers' utility to save the list of PIL Images as a video
+        export_to_video(frames_for_export, output_path, fps=fps)
+        print(f"Processing completed, and the results have been saved to: {output_path}")
+    else:
+        print(f"No frames were processed in the specified range.")
 
 
 if __name__ == "__main__":
@@ -82,9 +84,9 @@ if __name__ == "__main__":
         metadata = json_data["metadata"]
         bbox = json_data["bbox"]
 
-        video_path = video_root + "/" + metadata["path"]
+        video_path = os.path.join(video_root, metadata["path"])
         output_path = os.path.join(output_dir, json_file.replace(".json", ".mp4"))
 
-        draw_bbox_and_track_id(
+        draw_bbox_and_track_id_diffusers(
             video_path, bbox, output_path, metadata["cut"], metadata["crop"]
         )
