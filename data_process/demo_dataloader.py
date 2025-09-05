@@ -359,7 +359,7 @@ class OpenS2VDataset(Dataset):
                 ):
                     filtered_cross_data.append(temp_item)
             # For image
-            cross_item = self.data[key]
+            cross_item = self.data[selected_cross_data_key]
             cross_part = selected_cross_data_id.split("/", 1)[0]
             _, cross_image_info = self.get_batch(
                 item=cross_item,
