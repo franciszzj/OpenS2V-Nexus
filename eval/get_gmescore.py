@@ -1,19 +1,21 @@
-import os
+import argparse
 import json
+import os
+
+import imageio
 import numpy as np
 from PIL import Image
-import argparse
-from utils.gme.gme_model import GmeQwen2VL
 from tqdm import tqdm
 
-import decord
+from utils.gme.gme_model import GmeQwen2VL
+
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 def sample_video_frames(video_path, num_frames=16):
-    vr = decord.VideoReader(video_path)
-    total_frames = len(vr)
+    reader = imageio.get_reader(video_path, "ffmpeg")
+    total_frames = reader.count_frames()
 
     if num_frames is None:
         frame_indices = np.arange(total_frames)
@@ -22,10 +24,11 @@ def sample_video_frames(video_path, num_frames=16):
 
     frames = []
     for idx in frame_indices:
-        frame = vr[int(idx)].asnumpy()
+        frame = reader.get_data(int(idx))
         pil_image = Image.fromarray(frame)
         frames.append(pil_image)
 
+    reader.close()
     return frames
 
 
@@ -73,7 +76,7 @@ def main():
 
     with open(input_json_file, "r") as f:
         prompts = json.load(f)
-    gme = GmeQwen2VL(model_path, attn_model="flash_attention_2", device=device)
+    gme = GmeQwen2VL(model_path, attn_model="sdpa", device=device)
 
     video_files = [f for f in os.listdir(input_video_folder) if f.endswith(".mp4")]
 
@@ -93,6 +96,7 @@ def main():
         e_query = gme.get_text_embeddings(
             texts=[text_prompt] * len(frames),
             instruction="Find an image that matches the given text.",
+            show_progress_bar=False,
         )
         e_corpus = gme.get_image_embeddings(
             images=frames, is_query=False, show_progress_bar=False
