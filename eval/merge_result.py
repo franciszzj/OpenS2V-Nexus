@@ -1,5 +1,6 @@
-import os
 import json
+import os
+import sys
 
 
 def merge_scores_files(folder_path):
@@ -205,9 +206,9 @@ def process_scores(data, eval_type):
         }
 
 
-eval_type = "Open-Domain"  # [Open-Domain, Human-Domain, Single-Object]
-input_json_folder = "demo_result/model_name_output_json"
-output_json_path = f"demo_result/model_name_{eval_type}.json"
+eval_type = sys.argv[1]  # [Open-Domain, Human-Domain, Single-Domain, Single-Object]
+input_json_folder = sys.argv[2]
+output_json_path = sys.argv[3]
 
 merged_score = merge_scores_files(input_json_folder)
 process_score = process_scores(merged_score, eval_type)
