@@ -1,9 +1,10 @@
 import argparse
-import os.path as osp
-from tqdm import tqdm
+import json
 
 import os
-import json
+import os.path as osp
+
+import imageio
 import numpy as np
 import supervision as sv
 import torch
@@ -14,6 +15,7 @@ from mmengine.runner.amp import autocast
 from mmyolo.registry import RUNNERS
 from PIL import Image
 from torchvision.ops import nms
+from tqdm import tqdm
 from transformers import (
     AutoProcessor,
     AutoTokenizer,
@@ -21,7 +23,6 @@ from transformers import (
     CLIPVisionModelWithProjection,
 )
 from utils.gme.gme_model import GmeQwen2VL
-import decord
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -41,8 +42,8 @@ LABEL_ANNOTATOR = LabelAnnotator(text_padding=4, text_scale=0.5, text_thickness=
 
 
 def sample_video_frames(video_path, num_frames=16):
-    vr = decord.VideoReader(video_path)
-    total_frames = len(vr)
+    reader = imageio.get_reader(video_path, "ffmpeg")
+    total_frames = reader.count_frames()
 
     if num_frames is None:
         frame_indices = np.arange(total_frames)
@@ -51,10 +52,11 @@ def sample_video_frames(video_path, num_frames=16):
 
     frames = []
     for idx in frame_indices:
-        frame = vr[int(idx)].asnumpy()
+        frame = reader.get_data(int(idx))
         pil_image = Image.fromarray(frame)
         frames.append(pil_image)
 
+    reader.close()
     return frames
 
 
