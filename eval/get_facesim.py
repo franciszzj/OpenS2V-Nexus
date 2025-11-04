@@ -1,16 +1,17 @@
-import os
-import json
 import argparse
+import json
+import os
+
 import cv2
+import imageio
 import numpy as np
 import torch
 from insightface.app import FaceAnalysis
 from insightface.utils import face_align
 from PIL import Image
 from torchvision import transforms
-from utils.curricularface import get_model
-import decord
 from tqdm import tqdm
+from utils.curricularface import get_model
 
 
 def load_image(image):
@@ -21,16 +22,18 @@ def load_image(image):
 
 
 def sample_video_frames(video_path, num_frames=32):
-    vr = decord.VideoReader(video_path)
-    total_frames = len(vr)
+    reader = imageio.get_reader(video_path, "ffmpeg")
+    total_frames = reader.count_frames()
     if num_frames is None:
         frame_indices = np.arange(total_frames)
     else:
         frame_indices = np.linspace(0, total_frames - 1, num_frames, dtype=int)
     frames = []
     for idx in frame_indices:
-        frame = vr[int(idx)].asnumpy()
+        frame = reader.get_data(int(idx))
         frames.append(frame)
+
+    reader.close()
     return frames
 
 
