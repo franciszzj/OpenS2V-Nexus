@@ -1,19 +1,22 @@
-import os
-import json
 import argparse
-import numpy as np
-from PIL import Image
+import json
+import os
 from typing import List
-from tqdm import tqdm
 
-import torch.nn as nn
+import imageio
+
+import numpy as np
 import torch
 
-from q_align.model.builder import load_pretrained_model
+import torch.nn as nn
+from PIL import Image
 from q_align.constants import IMAGE_TOKEN_INDEX
 from q_align.mm_utils import tokenizer_image_token
 
-from decord import VideoReader
+from q_align.model.builder import load_pretrained_model
+from tqdm import tqdm
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 class QAlignVideoScorer(nn.Module):
@@ -106,13 +109,19 @@ class QAlignVideoScorer(nn.Module):
 
 # Read video in sliding window manner, splitting video into segments with number of frames as window_size
 def load_video_sliding_window(video_file, window_size=5):
-    vr = VideoReader(video_file)
-    total_frames = len(vr)
+    reader = imageio.get_reader(video_file)
+    total_frames = reader.count_frames()
     frames_by_group = []
 
     # Calculate the left and right extension of the window
     left_extend = (window_size - 1) // 2
     right_extend = window_size - 1 - left_extend
+
+    # Read all frames into memory for random access
+    all_frames = []
+    for frame in reader:
+        all_frames.append(frame)
+    reader.close()
 
     for current_frame in range(total_frames):
         # Calculate the start and end frame of the window
@@ -128,7 +137,7 @@ def load_video_sliding_window(video_file, window_size=5):
             else:
                 frame_indices.insert(0, frame_indices[0])
 
-        frames = vr.get_batch(frame_indices).asnumpy()
+        frames = [all_frames[idx] for idx in frame_indices]
 
         # Special handling for the beginning frames to ensure consistency with window_size frames
         if current_frame < left_extend:
