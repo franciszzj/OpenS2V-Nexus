@@ -1,21 +1,19 @@
+import argparse
+import json
 import os
+
+import imageio
 import numpy as np
 import torch
 import torch.nn as nn
 from PIL import Image
-from transformers import (
-    CLIPProcessor,
-    CLIPVisionModelWithProjection,
-)
 from tqdm import tqdm
-import argparse
-import json
-import decord
+from transformers import CLIPProcessor, CLIPVisionModelWithProjection
 
 
 def sample_video_frames(video_path, num_frames=16):
-    vr = decord.VideoReader(video_path)
-    total_frames = len(vr)
+    reader = imageio.get_reader(video_path, "ffmpeg")
+    total_frames = reader.count_frames()
 
     if num_frames is None:
         frame_indices = np.arange(total_frames)
@@ -24,10 +22,11 @@ def sample_video_frames(video_path, num_frames=16):
 
     frames = []
     for idx in frame_indices:
-        frame = vr[int(idx)].asnumpy()
+        frame = reader.get_data(int(idx))
         pil_image = Image.fromarray(frame)
         frames.append(pil_image)
 
+    reader.close()
     return frames
 
 
