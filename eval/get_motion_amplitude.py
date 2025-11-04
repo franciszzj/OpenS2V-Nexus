@@ -1,16 +1,17 @@
-import os
-import cv2
-import numpy as np
-from PIL import Image
 import argparse
 import json
-import decord
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import os
+from concurrent.futures import as_completed, ThreadPoolExecutor
+
+import cv2
+import imageio
+import numpy as np
+from PIL import Image
 
 
-def sample_video_frames(video_path, num_frames=None):
-    vr = decord.VideoReader(video_path)
-    total_frames = len(vr)
+def sample_video_frames(video_path, num_frames=16):
+    reader = imageio.get_reader(video_path, "ffmpeg")
+    total_frames = reader.count_frames()
 
     if num_frames is None:
         frame_indices = np.arange(total_frames)
@@ -19,10 +20,11 @@ def sample_video_frames(video_path, num_frames=None):
 
     frames = []
     for idx in frame_indices:
-        frame = vr[int(idx)].asnumpy()
+        frame = reader.get_data(int(idx))
         pil_image = Image.fromarray(frame)
         frames.append(pil_image)
 
+    reader.close()
     return frames
 
 
