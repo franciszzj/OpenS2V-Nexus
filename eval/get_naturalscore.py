@@ -1,12 +1,14 @@
-import os
-import cv2
-import json
-import base64
 import argparse
+import base64
+import json
+import os
+import time
+from concurrent.futures import as_completed, ThreadPoolExecutor
+
+import cv2
 from openai import OpenAI
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from tenacity import retry, stop_after_attempt, wait_exponential
 from tqdm import tqdm
-from tenacity import retry, wait_exponential, stop_after_attempt
 
 
 prompt = """
@@ -15,7 +17,7 @@ Your task is to determine how realistic the given video clip appears, based on 1
 - **Common sense consistency**: Are the objects, people, and interactions logically coherent in the context of the video?
 - **Physical plausibility**: Do lighting, shadows, motion, and reflections obey the laws of physics? Are the objects in motion consistent with real-world physics?
 - **Naturalness**: Does the visual quality (textures, details, proportions, etc.) resemble what we would expect in real life? Is there any unnatural visual distortion?
-- **AI generation artifacts**: Are there signs of unnatural blurring, morphing, glitches, distortions, or inconsistencies across frames? 
+- **AI generation artifacts**: Are there signs of unnatural blurring, morphing, glitches, distortions, or inconsistencies across frames?
 
 **If the video contains humans**, pay special attention to:
 - Are the facial features realistic and anatomically correct (e.g., eyes, mouth, and nose proportions)?
